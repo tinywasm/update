@@ -2,6 +2,7 @@ package update
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -16,13 +17,13 @@ func Swap(targetPath, newFilePath string) (string, error) {
 	var backupPath string
 	if _, err := os.Stat(targetPath); err == nil {
 		backupPath = targetPath + ".old"
-		if err := os.Rename(targetPath, backupPath); err != nil {
+		if err := moveFile(targetPath, backupPath); err != nil {
 			return "", fmt.Errorf("failed to backup: %w", err)
 		}
 	}
-	if err := os.Rename(newFilePath, targetPath); err != nil {
+	if err := moveFile(newFilePath, targetPath); err != nil {
 		if backupPath != "" {
-			_ = os.Rename(backupPath, targetPath)
+			_ = moveFile(backupPath, targetPath)
 		}
 		return "", fmt.Errorf("failed to install: %w", err)
 	}
@@ -35,5 +36,33 @@ func Rollback(targetPath, backupPath string) error {
 	if backupPath == "" {
 		return nil
 	}
-	return os.Rename(backupPath, targetPath)
+	return moveFile(backupPath, targetPath)
+}
+
+// moveFile renames src to dst, falling back to copy+remove across filesystems (EXDEV).
+func moveFile(src, dst string) error {
+	if err := os.Rename(src, dst); err == nil {
+		return nil
+	}
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	info, err := in.Stat()
+	if err != nil {
+		return err
+	}
+	out, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, info.Mode())
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
+		return err
+	}
+	if err := out.Close(); err != nil {
+		return err
+	}
+	return os.Remove(src)
 }

@@ -3,6 +3,7 @@ package update
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -37,4 +38,41 @@ func ResolveLatestVersion(source string, download func(string) ([]byte, error)) 
 	}
 
 	return release.TagName, nil
+}
+
+// IsOutdated reports whether current is strictly older than latest (MAJOR.MINOR.PATCH,
+// leading "v" optional, pre-release/build suffix ignored). Any parse failure -> false,
+// so "dev"/empty builds are never reported as outdated.
+func IsOutdated(current, latest string) bool {
+	c, ok1 := parseSemver(current)
+	l, ok2 := parseSemver(latest)
+	if !ok1 || !ok2 {
+		return false
+	}
+	for i := 0; i < 3; i++ {
+		if c[i] != l[i] {
+			return c[i] < l[i]
+		}
+	}
+	return false
+}
+
+func parseSemver(v string) ([3]int, bool) {
+	var out [3]int
+	v = strings.TrimPrefix(strings.TrimSpace(v), "v")
+	if i := strings.IndexAny(v, "-+"); i >= 0 {
+		v = v[:i]
+	}
+	parts := strings.Split(v, ".")
+	if len(parts) != 3 {
+		return out, false
+	}
+	for i := 0; i < 3; i++ {
+		n, err := strconv.Atoi(parts[i])
+		if err != nil {
+			return out, false
+		}
+		out[i] = n
+	}
+	return out, true
 }
