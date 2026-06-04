@@ -4,7 +4,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
+)
+
+const (
+	EnvGitHubToken = "GITHUB_TOKEN"
+	EnvGHToken     = "GH_TOKEN"
 )
 
 // DefaultDownload was MOVED verbatim from tinywasm/installer (mode_binary.go).
@@ -12,7 +18,22 @@ func DefaultDownload(url string) ([]byte, error) {
 	client := &http.Client{
 		Timeout: 60 * time.Second,
 	}
-	resp, err := client.Get(url)
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Accept", "application/vnd.github+json")
+
+	token := os.Getenv(EnvGitHubToken)
+	if token == "" {
+		token = os.Getenv(EnvGHToken)
+	}
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
