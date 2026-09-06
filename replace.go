@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// Swap and Rollback were MOVED (extracted) from tinywasm/deploy (handler.go:
+// Swap and Rollback were MOVED (extracted) from webtyp/deploy (handler.go:
 // HandleUpdate, the "Backup Existing Binary" / "Move New Binary" / restore steps).
 // They preserve deploy's proven os.Rename-based logic verbatim.
 

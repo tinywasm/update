@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ResolveLatestVersion was MOVED from tinywasm/installer (mode_binary.go:
+// ResolveLatestVersion was MOVED from webtyp/installer (mode_binary.go:
 // resolveLatestVersion). The only change is decoupling: the *installer.Deps
 // parameter was replaced by an injected download func so the proven logic lives
 // here without depending on the installer package.

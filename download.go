@@ -13,7 +13,7 @@ const (
 	EnvGHToken     = "GH_TOKEN"
 )
 
-// DefaultDownload was MOVED verbatim from tinywasm/installer (mode_binary.go).
+// DefaultDownload was MOVED verbatim from webtyp/installer (mode_binary.go).
 func DefaultDownload(url string) ([]byte, error) {
 	client := &http.Client{
 		Timeout: 60 * time.Second,

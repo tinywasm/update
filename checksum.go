@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// VerifyChecksum was MOVED verbatim from tinywasm/installer (mode_binary.go:
+// VerifyChecksum was MOVED verbatim from webtyp/installer (mode_binary.go:
 // verifyChecksum) — only the name was exported. It verifies data's SHA256 against
 // the entry for asset in a checksums.txt body ("<hex>  <asset>" per line).
 func VerifyChecksum(asset string, data []byte, sums []byte) error {

@@ -24,11 +24,11 @@ package main
 
 import (
     "fmt"
-    "github.com/tinywasm/update"
+    "webtyp.com/update"
 )
 
 func main() {
-    source := "https://github.com/tinywasm/tinywasm"
+    source := "https://github.com/webtyp/app"
 
     // 1. Resolve latest version
     latest, err := update.ResolveLatestVersion(source, update.DefaultDownload)
@@ -38,7 +38,7 @@ func main() {
     fmt.Printf("Latest version: %s\n", latest)
 
     // 2. Download asset and checksums
-    assetURL := fmt.Sprintf("%s/releases/download/%s/tinywasm-linux-amd64", source, latest)
+    assetURL := fmt.Sprintf("%s/releases/download/%s/webtyp-linux-amd64", source, latest)
     sumsURL := fmt.Sprintf("%s/releases/download/%s/checksums.txt", source, latest)
 
     data, err := update.DefaultDownload(assetURL)
@@ -52,7 +52,7 @@ func main() {
     }
 
     // 3. Verify checksum
-    if err := update.VerifyChecksum("tinywasm-linux-amd64", data, sums); err != nil {
+    if err := update.VerifyChecksum("webtyp-linux-amd64", data, sums); err != nil {
         panic(err)
     }
     fmt.Println("Checksum verified!")
